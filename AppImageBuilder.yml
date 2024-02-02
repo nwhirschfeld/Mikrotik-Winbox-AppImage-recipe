@@ -1,0 +1,82 @@
+version: 1
+script:
+  # remove AppDir from previous builds, it's always a good idea to start fresh.
+  - rm -rf $APPDIR || true
+  # download npp binaries
+  - wget -c https://download.mikrotik.com/winbox/3.40/winbox.exe
+  # create a new AppDir
+  - mkdir -p $APPDIR/winbox
+  # move binaries to target location
+  - mv winbox.exe $APPDIR/winbox
+  # download icon for our bundle
+  - mkdir -p $APPDIR/usr/share/icons/hicolor/scalable/apps
+  - wget https://mikrotik.com/logo/library/logo/SVG/MT_Symbol_Black.svg -O $APPDIR/usr/share/icons/hicolor/scalable/apps/winbox.svg
+
+AppDir:
+  path: ./AppDir
+
+  app_info:
+    id: org.mikrotik-winbox.winbox
+    name: winbox
+    # the icon mame will not contain the extension
+    icon: winbox
+    version: "3.40"
+    # we will use wine as entrypoint
+    exec: usr/bin/wine
+    # set the Windows application main executable as first argument
+    exec_args: $APPDIR/winbox/winbox.exe
+
+  apt:
+    arch: [amd64, i386]
+    sources:
+      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse'
+      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse'
+      - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse'
+        key_url: 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3b4fe6acc0b21f32'
+      - sourceline: 'deb https://dl.winehq.org/wine-builds/ubuntu/ focal main'
+        key_url: 'https://dl.winehq.org/wine-builds/winehq.key'
+
+    include:
+      - winehq-stable
+      - libfreetype6
+      - libfontconfig1
+    exclude:
+      - dpkg
+
+  files:
+    exclude:
+      - usr/lib/x86_64-linux-gnu/gconv
+      - usr/share/man
+      - usr/share/doc/*/README.*
+      - usr/share/doc/*/changelog.*
+      - usr/share/doc/*/NEWS.*
+      - usr/share/doc/*/TODO.*
+  runtime:
+    path_mappings:
+      - /opt/wine-stable:$APPDIR/opt/wine-stable
+
+  test:
+    debian:
+      image: appimagecrafters/tests-env:debian-stable
+      command: "./AppRun --version"
+      use_host_x: True
+    centos:
+      image: appimagecrafters/tests-env:centos-7
+      command: "./AppRun --version"
+      use_host_x: True
+    fedora:
+      image: appimagecrafters/tests-env:fedora-30
+      command: "./AppRun --version"
+      use_host_x: True
+    ubuntu:
+      image: appimagecrafters/tests-env:ubuntu-xenial
+      command: "./AppRun --version"
+      use_host_x: True
+    arch:
+      image: appimagecrafters/tests-env:archlinux-latest
+      command: "./AppRun --version"
+      use_host_x: True
+
+
+AppImage:
+  arch: x86_64
