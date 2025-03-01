@@ -3,11 +3,11 @@ script:
   # remove AppDir from previous builds, it's always a good idea to start fresh.
   - rm -rf $APPDIR || true
   # download npp binaries
-  - wget -c https://download.mikrotik.com/winbox/3.40/winbox.exe
+  - wget -c https://download.mikrotik.com/routeros/winbox/3.41/winbox64.exe 
   # create a new AppDir
   - mkdir -p $APPDIR/winbox
   # move binaries to target location
-  - mv winbox.exe $APPDIR/winbox
+  - mv winbox64.exe $APPDIR/winbox/winbox64.exe
   # download icon for our bundle
   - mkdir -p $APPDIR/usr/share/icons/hicolor/scalable/apps
   - wget https://mikrotik.com/logo/library/logo/SVG/MT_Symbol_Black.svg -O $APPDIR/usr/share/icons/hicolor/scalable/apps/winbox.svg
@@ -20,7 +20,7 @@ AppDir:
     name: winbox
     # the icon mame will not contain the extension
     icon: winbox
-    version: "3.40"
+    version: "3.41"
     # we will use wine as entrypoint
     exec: usr/bin/wine
     # set the Windows application main executable as first argument
