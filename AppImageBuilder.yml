@@ -77,6 +77,5 @@ AppDir:
       command: "./AppRun --version"
       use_host_x: True
 
-
 AppImage:
   arch: x86_64
